@@ -19,3 +19,22 @@
 *.exe
 *.out
 *.app
+bioloidgp
+
+# Data
+build/data/*
+
+# CMakeFiles
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
+install_manifest.txt
+
+# Qt4 files
+*.cxx
+moc_*
+
+# Program generated files
+glog
+captures

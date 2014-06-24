@@ -68,9 +68,9 @@ MyWindow::~MyWindow()
 //==============================================================================
 void MyWindow::timeStepping()
 {
-    // // External force
-    // mWorld->getSkeleton("drc_skeleton")->getBodyNode("pelvis")->addExtForce(
-    //       mForce);
+    // External force
+    mWorld->getSkeleton(0)->getBodyNode("torso")->addExtForce(
+          mForce);
 
     // Internal force
     mController->update(mWorld->getTime());
@@ -96,10 +96,16 @@ void MyWindow::drawSkels()
     for (unsigned int i = 0; i < mWorld->getNumSkeletons(); i++) {
         if (i == 1) {
             glPushMatrix();
-            glTranslated(0, -0.95, 0);
-            bioloidgp::utils::renderChessBoard(10, 10, 5, 5);
+            glTranslated(0, -0.30, 0);
+            bioloidgp::utils::renderChessBoard(100, 100, 50.0, 50.0);
             glPopMatrix();
-            continue; // Skip the ground
+
+            glPushMatrix();
+            glTranslated(0, -0.001, 0);
+            mWorld->getSkeleton(i)->draw(mRI);
+            glPopMatrix();
+            
+            continue;
         }
         mWorld->getSkeleton(i)->draw(mRI);
     }
@@ -108,8 +114,8 @@ void MyWindow::drawSkels()
     if (mImpulseDuration > 0)
     {
         Eigen::Vector3d poa
-            =  mWorld->getSkeleton("drc_skeleton")->getBodyNode(
-                "pelvis")->getTransform()
+            =  mWorld->getSkeleton(0)->getBodyNode(
+                "torso")->getTransform()
             * Eigen::Vector3d(0.0, 0.0, 0.0);
         Eigen::Vector3d start = poa - mForce / 500.0;
         double len = mForce.norm() / 500.0;
@@ -163,22 +169,22 @@ void MyWindow::keyboard(unsigned char _key, int _x, int _y)
         mShowMarkers = !mShowMarkers;
         break;
     case 'a':  // upper right force
-        mForce[0] = 500;
+        mForce[0] = 5;
         mImpulseDuration = 100;
         std::cout << "push forward" << std::endl;
         break;
     case 's':  // upper right force
-        mForce[0] = -500;
+        mForce[0] = -5;
         mImpulseDuration = 100;
         std::cout << "push backward" << std::endl;
         break;
     case 'd':  // upper right force
-        mForce[2] = 500;
+        mForce[2] = 5;
         mImpulseDuration = 100;
         std::cout << "push right" << std::endl;
         break;
     case 'f':  // upper right force
-        mForce[2] = -500;
+        mForce[2] = -5;
         mImpulseDuration = 100;
         std::cout << "push left" << std::endl;
         break;
