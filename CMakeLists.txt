@@ -70,6 +70,9 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 find_package(Eigen REQUIRED)
 message(STATUS "Eigen_INCLUDE_DIRS = ${Eigen_INCLUDE_DIRS}")
 include_directories(${Eigen_INCLUDE_DIRS})
+find_package(TinyXML2 REQUIRED)
+message(STATUS "TinyXML2_INCLUDE_DIRS = ${TinyXML2_INCLUDE_DIRS}")
+message(STATUS "TinyXML2_LIBRARIES = ${TinyXML2_LIBRARIES}")
 
 message(STATUS "=====================================================")
 message(STATUS "configuring the project")
@@ -97,6 +100,7 @@ target_link_libraries(bioloidgp ${QT_LIBRARIES})
 target_link_libraries(bioloidgp ${Boost_LIBRARIES})
 target_link_libraries(bioloidgp glog)
 
+target_link_libraries(bioloidgp ${TinyXML2_LIBRARIES})
 target_link_libraries(bioloidgp dart4 dart-core4)
 
 set_target_properties(bioloidgp PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")

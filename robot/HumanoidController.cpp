@@ -10,6 +10,7 @@
 #include "dart/dynamics/BodyNode.h"
 #include "dart/dynamics/Joint.h"
 #include "utils/CppCommon.h"
+#include "MotorMap.h"
 
 namespace bioloidgp {
 namespace robot {
@@ -23,14 +24,20 @@ HumanoidController::HumanoidController(
     , MEMBER_INIT(collisionSolver, _collisionSolver)
 
 {
+    const int NDOFS = robot()->getDof();
+
+    set_motormap( new MotorMap(18, NDOFS) );
+    motormap()->load("data/urdf/BioloidGP/BioloidGPMotorMap.xml");
     setJointDamping();
 
-    const int NDOFS = robot()->getDof();
     mKp = Eigen::VectorXd::Zero(NDOFS);
     mKd = Eigen::VectorXd::Zero(NDOFS);
     for (int i = 6; i < NDOFS; ++i) {
-        mKp(i) = 1000.0;
+        mKp(i) = 600.0;
         mKd(i) = 1.0;
+    }
+    for (int i = 0; i < robot()->getNumBodyNodes(); i++) {
+        cout << "Joint " << i + 5 << " : " << robot()->getJoint(i)->getName() << endl;
     }
 }
 
@@ -41,8 +48,16 @@ void HumanoidController::update(double _currentTime) {
     const int NDOFS = robot()->getDof();
     Eigen::VectorXd q    = robot()->getPositions();
     Eigen::VectorXd dq   = robot()->getVelocities();
-    Eigen::VectorXd qhat = Eigen::VectorXd::Zero(NDOFS);
+    // Eigen::VectorXd qhat = Eigen::VectorXd::Zero(NDOFS);
     Eigen::VectorXd tau  = Eigen::VectorXd::Zero(NDOFS);
+
+    Eigen::VectorXd motor_qhat(18);
+    motor_qhat <<
+        1.0, 1.0, -0.5, 0.5, 0.0, 0.0,
+        0.0, 0.0,
+        0.0, 0.0,  0.6, 0.6,  -1.0, -1.0,  0.5, 0.5,  0.0, 0.0;
+    Eigen::VectorXd qhat = motormap()->fromMotorMapVector( motor_qhat );
+
 
     tau.head<6>() = Eigen::Vector6d::Zero();
     for (int i = 6; i < NDOFS; ++i) {

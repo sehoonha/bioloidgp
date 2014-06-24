@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
   Skeleton* robot
       = urdfLoader.parseSkeleton(
           "data/urdf/BioloidGP/BioloidGP.URDF");
-
+  robot->enableSelfCollision();
 
   myWorld->addSkeleton(robot);
   myWorld->addSkeleton(ground);
