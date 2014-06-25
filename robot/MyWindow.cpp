@@ -57,6 +57,7 @@ MyWindow::MyWindow(bioloidgp::robot::HumanoidController* _controller)
 {
     mForce = Eigen::Vector3d::Zero();
     mImpulseDuration = 0.0;
+
 }
 
 //==============================================================================

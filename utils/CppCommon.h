@@ -47,6 +47,7 @@ using google::FATAL;
 #define MAX(a,b) (((a)>(b))?(a):(b))
 #define CONFINE(a, lo, hi) (((a)<(lo))?(lo):(  (((a)>(hi))?(hi):(a))           ))
 
+#define DATA_DIR "../data"
 
 // #include "Paths.h"
 

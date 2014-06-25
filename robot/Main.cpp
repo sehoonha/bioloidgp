@@ -37,6 +37,8 @@
 
 #include <iostream>
 
+#include "utils/CppCommon.h"
+
 #include "dart/dynamics/Skeleton.h"
 #include "dart/simulation/World.h"
 #include "dart/simulation/World.h"
@@ -62,10 +64,10 @@ int main(int argc, char* argv[])
   // Load ground and Atlas robot and add them to the world
   DartLoader urdfLoader;
   Skeleton* ground = urdfLoader.parseSkeleton(
-      "data/sdf/ground.urdf");
+      DATA_DIR"/sdf/ground.urdf");
   Skeleton* robot
       = urdfLoader.parseSkeleton(
-          "data/urdf/BioloidGP/BioloidGP.URDF");
+          DATA_DIR"/urdf/BioloidGP/BioloidGP.URDF");
   robot->enableSelfCollision();
 
   myWorld->addSkeleton(robot);

@@ -28,13 +28,13 @@ HumanoidController::HumanoidController(
     const int NDOFS = robot()->getDof();
     const int NMOTORS = 18;
 
-    setJointDamping();
+    setJointDamping(0.1);
 
     set_motormap( new MotorMap(NMOTORS, NDOFS) );
-    motormap()->load("data/urdf/BioloidGP/BioloidGPMotorMap.xml");
+    motormap()->load(DATA_DIR"/urdf/BioloidGP/BioloidGPMotorMap.xml");
 
     set_motion( new Motion(NMOTORS) );
-    motion()->load("data/xml/motion.xml");
+    motion()->load(DATA_DIR"/xml/motion.xml");
 
     mKp = Eigen::VectorXd::Zero(NDOFS);
     mKd = Eigen::VectorXd::Zero(NDOFS);
@@ -72,6 +72,15 @@ void HumanoidController::update(double _currentTime) {
         tau(i) = -mKp(i) * (q(i) - qhat(i))
             -mKd(i) * dq(i);
     }
+
+
+    // Confine within the limit: 25% of stall torque
+    // Reference: http://support.robotis.com/en/product/dynamixel/ax_series/dxl_ax_actuator.htm
+    const double MAX_TORQUE = 0.25 * 1.5;
+    for (int i = 6; i < NDOFS; i++) {
+        tau(i) = CONFINE(tau(i), -MAX_TORQUE, MAX_TORQUE);
+    }
+    cout << _currentTime << " : " << tau.transpose() << endl;
     
     robot()->setForces(tau);
 

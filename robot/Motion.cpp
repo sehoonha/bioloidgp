@@ -78,7 +78,7 @@ Eigen::VectorXd Motion::targetPose(double t) const {
         accum_t += s.duration;
         bool is_last = ((i + 1) == steps.size());
         if (t <= accum_t || is_last) {
-            cout << t << " " << accum_t << " -> " << i << endl;
+            // cout << t << " " << accum_t << " -> " << i << endl;
             return s.targetpose;
         }
     }
