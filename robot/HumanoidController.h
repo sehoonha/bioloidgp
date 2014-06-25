@@ -24,6 +24,7 @@ class ConstraintSolver;
 namespace bioloidgp {
 namespace robot {
 class MotorMap;
+struct Motion;
 } // namespace robot
 } // namespace bioloidgp
 
@@ -50,6 +51,7 @@ protected:
     MEMBER_PTR(dart::dynamics::Skeleton*, robot);
     MEMBER_PTR(dart::constraint::ConstraintSolver*, collisionSolver);
     MEMBER_PTR(MotorMap*, motormap);
+    MEMBER_PTR(Motion*, motion);
 
     Eigen::VectorXd mKp;
     Eigen::VectorXd mKd;

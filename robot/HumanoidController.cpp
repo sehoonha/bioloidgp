@@ -11,6 +11,7 @@
 #include "dart/dynamics/Joint.h"
 #include "utils/CppCommon.h"
 #include "MotorMap.h"
+#include "Motion.h"
 
 namespace bioloidgp {
 namespace robot {
@@ -25,10 +26,15 @@ HumanoidController::HumanoidController(
 
 {
     const int NDOFS = robot()->getDof();
+    const int NMOTORS = 18;
 
-    set_motormap( new MotorMap(18, NDOFS) );
-    motormap()->load("data/urdf/BioloidGP/BioloidGPMotorMap.xml");
     setJointDamping();
+
+    set_motormap( new MotorMap(NMOTORS, NDOFS) );
+    motormap()->load("data/urdf/BioloidGP/BioloidGPMotorMap.xml");
+
+    set_motion( new Motion(NMOTORS) );
+    motion()->load("data/xml/motion.xml");
 
     mKp = Eigen::VectorXd::Zero(NDOFS);
     mKd = Eigen::VectorXd::Zero(NDOFS);
@@ -51,11 +57,13 @@ void HumanoidController::update(double _currentTime) {
     // Eigen::VectorXd qhat = Eigen::VectorXd::Zero(NDOFS);
     Eigen::VectorXd tau  = Eigen::VectorXd::Zero(NDOFS);
 
-    Eigen::VectorXd motor_qhat(18);
-    motor_qhat <<
-        1.0, 1.0, -0.5, 0.5, 0.0, 0.0,
-        0.0, 0.0,
-        0.0, 0.0,  0.6, 0.6,  -1.0, -1.0,  0.5, 0.5,  0.0, 0.0;
+    // Eigen::VectorXd motor_qhat(18);
+    // motor_qhat <<
+    //     1.0, 1.0, -0.5, 0.5, 0.0, 0.0,
+    //     0.0, 0.0,
+    //     0.0, 0.0,  0.6, 0.6,  -1.0, -1.0,  0.5, 0.5,  0.0, 0.0;
+
+    Eigen::VectorXd motor_qhat = motion()->targetPose(_currentTime);
     Eigen::VectorXd qhat = motormap()->fromMotorMapVector( motor_qhat );
 
 
