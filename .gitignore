@@ -23,6 +23,7 @@ bioloidgp
 
 # Data
 build/data/*
+build/frames/*
 
 # CMakeFiles
 CMakeCache.txt

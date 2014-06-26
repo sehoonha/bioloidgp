@@ -47,6 +47,9 @@
 #include "dart/utils/sdf/SoftSdfParser.h"
 #include "dart/utils/urdf/DartLoader.h"
 
+#include "dart/constraint/ConstraintSolver.h"
+#include "dart/collision/bullet/BulletCollisionDetector.h"
+
 #include "robot/MyWindow.h"
 #include "robot/HumanoidController.h"
 // #include "robot/Controller.h"
@@ -59,10 +62,13 @@ using namespace dart::utils;
 int main(int argc, char* argv[])
 {
     srand( (unsigned int) time (NULL) );
-    // Create empty soft world
-    World* myWorld = new World;
 
-    // Load ground and Atlas robot and add them to the world
+    World* myWorld = new World;
+    // myWorld->getConstraintSolver()->setCollisionDetector(
+    //     new dart::collision::BulletCollisionDetector());
+    myWorld->setTimeStep(0.0005);
+
+    // // Load ground and Atlas robot and add them to the world
     DartLoader urdfLoader;
     Skeleton* ground = urdfLoader.parseSkeleton(
         DATA_DIR"/sdf/ground.urdf");
@@ -78,6 +84,7 @@ int main(int argc, char* argv[])
     Eigen::VectorXd q = robot->getPositions();
     q[0] = -0.5 * DART_PI;
     Eigen::VectorXd noise = 0.02 * Eigen::VectorXd::Random( q.size() );
+    noise.head<6>().setZero();
     robot->setPositions(q + noise);
     robot->computeForwardKinematics(true, true, false);
 

@@ -28,7 +28,7 @@ HumanoidController::HumanoidController(
     const int NDOFS = robot()->getDof();
     const int NMOTORS = 18;
 
-    setJointDamping(0.1);
+    // setJointDamping(0.1);
 
     set_motormap( new MotorMap(NMOTORS, NDOFS) );
     motormap()->load(DATA_DIR"/urdf/BioloidGP/BioloidGPMotorMap.xml");
@@ -76,7 +76,7 @@ void HumanoidController::update(double _currentTime) {
 
     // Confine within the limit: 25% of stall torque
     // Reference: http://support.robotis.com/en/product/dynamixel/ax_series/dxl_ax_actuator.htm
-    const double MAX_TORQUE = 0.25 * 1.5;
+    const double MAX_TORQUE = 0.5 * 1.5;
     for (int i = 6; i < NDOFS; i++) {
         tau(i) = CONFINE(tau(i), -MAX_TORQUE, MAX_TORQUE);
     }

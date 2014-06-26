@@ -36,6 +36,7 @@ file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/captures")
 # message(STATUS "Copy ${CMAKE_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}")
 # file(COPY ${CMAKE_SOURCE_DIR}/data DESTINATION ${CMAKE_BINARY_DIR})
 
+
 message(STATUS "=====================================================")
 message(STATUS "configuring dependancies...")
 message(STATUS "=====================================================")
@@ -73,6 +74,10 @@ include_directories(${Eigen_INCLUDE_DIRS})
 find_package(TinyXML2 REQUIRED)
 message(STATUS "TinyXML2_INCLUDE_DIRS = ${TinyXML2_INCLUDE_DIRS}")
 message(STATUS "TinyXML2_LIBRARIES = ${TinyXML2_LIBRARIES}")
+
+find_package(Bullet COMPONENTS BulletMath BulletCollision)
+message(STATUS "BULLET_INCLUDE_DIRS = ${BULLET_INCLUDE_DIRS}")
+include_directories(${BULLET_INCLUDE_DIRS})
 
 message(STATUS "=====================================================")
 message(STATUS "configuring the project")
