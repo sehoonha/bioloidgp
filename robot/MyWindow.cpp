@@ -58,6 +58,10 @@ MyWindow::MyWindow(bioloidgp::robot::HumanoidController* _controller)
     mForce = Eigen::Vector3d::Zero();
     mImpulseDuration = 0.0;
 
+    // 0.166622 0.548365 0.118241 0.810896
+    Eigen::Quaterniond q(0.810896, 0.166622, 0.548365, 0.118241);
+    mTrackBall.setQuaternion(q);
+    mTrans = Eigen::Vector3d(-32.242,  212.85, 21.7107);
 }
 
 //==============================================================================
@@ -91,6 +95,11 @@ void MyWindow::timeStepping()
 //==============================================================================
 void MyWindow::drawSkels()
 {
+    // Eigen::Quaterniond q = mTrackBall.getCurrQuat();
+    // cout << "Quat = " << q.x() << " " << q.y() << " " << q.z() << " " << q.w() << endl;
+    // cout << mTrans.transpose() << endl;
+    // cout << mWorld->getSkeleton(0)->getPositions().transpose() << endl;
+
 //  glEnable(GL_LIGHTING);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 

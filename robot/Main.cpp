@@ -58,51 +58,53 @@ using namespace dart::utils;
 
 int main(int argc, char* argv[])
 {
-  // Create empty soft world
-  World* myWorld = new World;
+    srand( (unsigned int) time (NULL) );
+    // Create empty soft world
+    World* myWorld = new World;
 
-  // Load ground and Atlas robot and add them to the world
-  DartLoader urdfLoader;
-  Skeleton* ground = urdfLoader.parseSkeleton(
-      DATA_DIR"/sdf/ground.urdf");
-  Skeleton* robot
-      = urdfLoader.parseSkeleton(
-          DATA_DIR"/urdf/BioloidGP/BioloidGP.URDF");
-  robot->enableSelfCollision();
+    // Load ground and Atlas robot and add them to the world
+    DartLoader urdfLoader;
+    Skeleton* ground = urdfLoader.parseSkeleton(
+        DATA_DIR"/sdf/ground.urdf");
+    Skeleton* robot
+        = urdfLoader.parseSkeleton(
+            DATA_DIR"/urdf/BioloidGP/BioloidGP.URDF");
+    robot->enableSelfCollision();
 
-  myWorld->addSkeleton(robot);
-  myWorld->addSkeleton(ground);
+    myWorld->addSkeleton(robot);
+    myWorld->addSkeleton(ground);
 
-  // Set initial configuration for Atlas robot
-  Eigen::VectorXd q = robot->getPositions();
-  q[0] = -0.5 * DART_PI;
-  robot->setPositions(q);
-  robot->computeForwardKinematics(true, true, false);
+    // Set initial configuration for Atlas robot
+    Eigen::VectorXd q = robot->getPositions();
+    q[0] = -0.5 * DART_PI;
+    Eigen::VectorXd noise = 0.02 * Eigen::VectorXd::Random( q.size() );
+    robot->setPositions(q + noise);
+    robot->computeForwardKinematics(true, true, false);
 
-  // Set gravity of the world
-  myWorld->setGravity(Eigen::Vector3d(0.0, -9.81, 0.0));
+    // Set gravity of the world
+    myWorld->setGravity(Eigen::Vector3d(0.0, -9.81, 0.0));
 
-  // Create a humanoid controller
-  bioloidgp::robot::HumanoidController* con =
-      new bioloidgp::robot::HumanoidController(robot, myWorld->getConstraintSolver());
+    // Create a humanoid controller
+    bioloidgp::robot::HumanoidController* con =
+        new bioloidgp::robot::HumanoidController(robot, myWorld->getConstraintSolver());
 
-  // Create a window and link it to the world
-  // MyWindow window(new Controller(robot, myWorld->getConstraintSolver()));
-  MyWindow window(con);
-  window.setWorld(myWorld);
+    // Create a window and link it to the world
+    // MyWindow window(new Controller(robot, myWorld->getConstraintSolver()));
+    MyWindow window(con);
+    window.setWorld(myWorld);
 
-  // Print manual
-  cout << "space bar: simulation on/off" << endl;
-  cout << "'p': playback/stop" << endl;
-  cout << "'[' and ']': play one frame backward and forward" << endl;
-  cout << "'v': visualization on/off" << endl;
-  cout << endl;
+    // Print manual
+    cout << "space bar: simulation on/off" << endl;
+    cout << "'p': playback/stop" << endl;
+    cout << "'[' and ']': play one frame backward and forward" << endl;
+    cout << "'v': visualization on/off" << endl;
+    cout << endl;
 
-  // Run glut loop
-  glutInit(&argc, argv);
-  window.initWindow(1280, 720, "BioloidGP Robot - with Dart4.0");
+    // Run glut loop
+    glutInit(&argc, argv);
+    window.initWindow(1280, 720, "BioloidGP Robot - with Dart4.0");
 
-  glutMainLoop();
+    glutMainLoop();
 
-  return 0;
+    return 0;
 }

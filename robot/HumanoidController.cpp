@@ -80,7 +80,7 @@ void HumanoidController::update(double _currentTime) {
     for (int i = 6; i < NDOFS; i++) {
         tau(i) = CONFINE(tau(i), -MAX_TORQUE, MAX_TORQUE);
     }
-    cout << _currentTime << " : " << tau.transpose() << endl;
+    // cout << _currentTime << " : " << tau.transpose() << endl;
     
     robot()->setForces(tau);
 
