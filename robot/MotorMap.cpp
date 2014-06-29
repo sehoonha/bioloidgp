@@ -46,7 +46,7 @@ MotorMap::~MotorMap() {
 
 
 bool MotorMap::load(const char* const filename) {
-    cout << "load motormap data from [" << filename << "]" << endl;
+    LOG(INFO) << "load motormap data from [" << filename << "]";
     // Read XML
     tinyxml2::XMLDocument doc;
     tinyxml2::XMLError result
@@ -54,11 +54,11 @@ bool MotorMap::load(const char* const filename) {
         // = doc.LoadFile(DART_DATA_PATH"xml/damageReduce/scene.xml" );
     if (result != tinyxml2::XML_NO_ERROR) {
         doc.PrintError();
-        cerr << "ErrorStr1: " << doc.GetErrorStr1() << endl;
-        cerr << "ErrorStr2: " << doc.GetErrorStr2() << endl;
+        LOG(ERROR) << "ErrorStr1: " << doc.GetErrorStr1();
+        LOG(ERROR) << "ErrorStr2: " << doc.GetErrorStr2();
         return false;
     }
-    cout << "read XML OK" << endl;    
+    LOG(INFO) << "read XML OK";
 
     tinyxml2::XMLElement* xnRobot = doc.FirstChildElement("robot");
     for (tinyxml2::XMLElement* xnMotor = xnRobot->FirstChildElement("motor");
@@ -68,9 +68,9 @@ bool MotorMap::load(const char* const filename) {
         std::string name = xnMotor->Attribute("name");
         Motor* m = new Motor(index, id, name);
         motors.push_back(m);
-        cout << index << " " << id << " " << name << endl;
+        LOG(INFO) << index << " " << id << " " << name; 
     }
-    cout << "read " << numMotors() << " motor data successfully." << endl;
+    LOG(INFO) << "read " << numMotors() << " motor data successfully.";
 
     return true;
 }

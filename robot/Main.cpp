@@ -61,6 +61,15 @@ using namespace dart::utils;
 
 int main(int argc, char* argv[])
 {
+   // google::ParseCommandLineFlags(&argc, &argv, true);
+    google::InitGoogleLogging((const char*)argv[0]);
+    // Define logging flag
+    FLAGS_alsologtostderr = true;
+    FLAGS_minloglevel = INFO;
+    FLAGS_log_dir = "./glog/";
+
+    LOG(INFO) << "BioloidGP program begins...";
+    
     srand( (unsigned int) time (NULL) );
 
     World* myWorld = new World;
@@ -101,11 +110,11 @@ int main(int argc, char* argv[])
     window.setWorld(myWorld);
 
     // Print manual
-    cout << "space bar: simulation on/off" << endl;
-    cout << "'p': playback/stop" << endl;
-    cout << "'[' and ']': play one frame backward and forward" << endl;
-    cout << "'v': visualization on/off" << endl;
-    cout << endl;
+    LOG(INFO) << "space bar: simulation on/off";
+    LOG(INFO) << "'p': playback/stop";
+    LOG(INFO) << "'[' and ']': play one frame backward and forward";
+    LOG(INFO) << "'v': visualization on/off";
+    LOG(INFO) << endl;
 
     // Run glut loop
     glutInit(&argc, argv);

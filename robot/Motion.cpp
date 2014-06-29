@@ -28,10 +28,9 @@ void parseStep(Step& s, int dim, tinyxml2::XMLElement* xnStep) {
     for (int i = 0; i < s.targetpose.size(); i++) {
         sin >> s.targetpose(i);
     }
-    cout << "step. duration = " << s.duration << " : "
-         << s.targetpose.transpose()
-         << " (" << s.targetpose.size() << ")"
-         << endl;
+    LOG(INFO) << "step. duration = " << s.duration << " : pose = "
+              << s.targetpose.transpose()
+              << " (" << s.targetpose.size() << ")";
 }
 
 // struct Step ends
@@ -46,19 +45,18 @@ Motion::Motion(int _dim)
 }
 
 bool Motion::load(const char* const filename) {
-    cout << "load motion from [" << filename << "]" << endl;
+    LOG(INFO) << FUNCTION_NAME() << " [" << filename << "]";
     // Read XML
     tinyxml2::XMLDocument doc;
     tinyxml2::XMLError result
         = doc.LoadFile(filename);
-        // = doc.LoadFile(DART_DATA_PATH"xml/damageReduce/scene.xml" );
     if (result != tinyxml2::XML_NO_ERROR) {
         doc.PrintError();
-        cerr << "ErrorStr1: " << doc.GetErrorStr1() << endl;
-        cerr << "ErrorStr2: " << doc.GetErrorStr2() << endl;
+        LOG(ERROR) << "ErrorStr1: " << doc.GetErrorStr1();
+        LOG(ERROR) << "ErrorStr2: " << doc.GetErrorStr2();
         return false;
     }
-    cout << "read XML OK" << endl;
+    LOG(INFO) << "read XML OK";
 
     steps.clear();
     tinyxml2::XMLElement* xnMotion = doc.FirstChildElement("motion");
@@ -68,7 +66,7 @@ bool Motion::load(const char* const filename) {
         parseStep(s, dim, xnStep);
         steps.push_back(s);
     }
-    cout << FUNCTION_NAME() << " OK" << endl;
+    LOG(INFO) << FUNCTION_NAME() << " OK"; 
 }
 
 Eigen::VectorXd Motion::targetPose(double t) const {
