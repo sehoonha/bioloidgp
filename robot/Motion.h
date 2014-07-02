@@ -24,7 +24,7 @@ struct Step {
 struct Motion {
     Motion(int _dim);
     bool load(const char* const filename);
-    bool loadMTN(const char* const filename);
+    bool loadMTN(const char* const filename, const char* const motionname);
 
     Eigen::VectorXd targetPose(double t) const;
 

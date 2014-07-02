@@ -6,8 +6,15 @@
  */
 
 #include "Motion.h"
+// Standard Libraries
 #include <sstream>
+#include <fstream>
+// Boost Libraries
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+// External Libraries
 #include <tinyxml2.h>
+// Local headers
 #include "utils/CppCommon.h"
 
 namespace bioloidgp {
@@ -67,6 +74,124 @@ bool Motion::load(const char* const filename) {
         steps.push_back(s);
     }
     LOG(INFO) << FUNCTION_NAME() << " OK"; 
+    return true;
+}
+
+bool Motion::loadMTN(const char* const filename, const char* const motionname) {
+    using boost::lexical_cast;
+    
+    LOG(INFO) << FUNCTION_NAME() << " file : [" << filename << "]";
+    LOG(INFO) << "motionname =  [" << motionname << "]";
+
+    std::ifstream fin(filename);
+    if (fin.is_open() == false) {
+        LOG(ERROR) << "cannot open the file.";
+        return false;
+    }
+
+    int pageIndex = 1;
+    std::string pageName = "";
+
+    int pageNextPageIndex = -1;
+    int pageExitPageIndex = 0;
+    int pageRepeatTime = 1;
+    double pageSpeedRate = 1.0;
+    int pageCtrlInertialForce = 1;
+
+    Eigen::VectorXd stepPose;
+    double stepPause;
+    double stepTime;
+
+    bool acceptPage = false;
+
+    while(true) {
+        const int MAX_LINE = 512;
+        char buf[MAX_LINE + 2];
+
+        fin.getline(buf, MAX_LINE);
+        if (fin.fail()) {
+            break;
+        }
+        // cout << "line = [" << buf << "]" << endl;
+
+        // For each line
+        std::vector<std::string> tokens;
+        boost::split(tokens, buf, boost::is_any_of("= "));
+
+        // If the line is empty
+        if (tokens.size() == 0) {
+            continue;
+        }
+
+        // Only accept the alphabet as command
+        std::string cmd = "";
+        for (int i = 0; i < tokens[0].size(); i++) {
+            char c = tokens[0][i];
+            if (std::isalpha(c) || std::isdigit(c) || c == '_') {
+                cmd += c;
+            }
+        }
+
+        if (cmd == "type") {
+            // Do nothing
+        } else if (cmd == "version") {
+            // Do nothing
+        } else if (cmd == "enable") {
+            // Do nothing
+        } else if (cmd == "motor_type") {
+            // Do nothing
+        } else if (cmd == "page_begin") {
+        } else if (cmd == "page_end") {
+            acceptPage = false;
+            pageIndex++;
+        } else if (cmd == "name") {
+            pageName = tokens[1];
+            if (pageName == motionname || pageIndex == pageNextPageIndex) {
+                acceptPage = true;
+            }
+            if (acceptPage) {
+                LOG(INFO) << "command = " << cmd << " : pageName = {" << pageName << "} at " << pageIndex;
+            }
+        } else if (cmd == "compliance") {
+        } else if (cmd == "play_param") {
+            if (acceptPage) {
+                pageNextPageIndex     = lexical_cast<int>(tokens[1]);
+                pageExitPageIndex     = lexical_cast<int>(tokens[2]);
+                pageRepeatTime        = lexical_cast<int>(tokens[3]);
+                pageSpeedRate         = lexical_cast<double>(tokens[4]);
+                pageCtrlInertialForce = lexical_cast<int>(tokens[5]);
+            
+                LOG(INFO) << "command = " << cmd << ". "
+                          << "pageNextPageIndex = " << pageNextPageIndex << " "
+                          << "pageExitPageIndex = " << pageExitPageIndex << " "
+                          << "pageRepeatTime = " << pageRepeatTime << " "
+                          << "pageSpeedRate = " << pageSpeedRate << " "
+                          << "pageCtrlInertialForce = " << pageCtrlInertialForce << " ";
+                
+            }
+            
+        } else if (cmd == "step") {
+            if (acceptPage) {
+                int n = tokens.size();
+                stepPose = Eigen::VectorXd::Zero(n - 3);
+                for (int i = 0; i < stepPose.size(); i++) {
+                    stepPose(i) = lexical_cast<double>(tokens[i + 1]);
+                }
+                stepPause = lexical_cast<double>(tokens[n - 2]);
+                stepTime  = lexical_cast<double>(tokens[n - 1]);
+                LOG(INFO) << "command = " << cmd << ". "
+                          << "stepPause = " << stepPause << " "
+                          << "stepTime = " << stepTime << " "
+                          << "stepPose = " << stepPose.transpose();
+            }
+        } else if (cmd == "1c") {
+            // Do nothing
+        } else {
+            LOG(FATAL) << "unknown command: [" << cmd << "]";
+        }
+    }
+    
+    return true;
 }
 
 Eigen::VectorXd Motion::targetPose(double t) const {
