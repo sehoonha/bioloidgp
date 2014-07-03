@@ -7,6 +7,7 @@
 
 #include "MotorMap.h"
 
+#include <algorithm>
 #include <tinyxml2.h>
 
 #include "utils/CppCommon.h"
@@ -23,13 +24,45 @@ struct Motor {
         , id(_id)
         , name(_name)
         {
+            angleAtMin = -(5.0 / 6.0) * UTILS_PI;
+            angleAtMax =  (5.0 / 6.0) * UTILS_PI;
         }
     int index;
     int id;
     std::string name;
+
+    double angleAtMin;
+    double angleAtMax;
+
+    void swapMinMaxAngles() {
+        std::swap(angleAtMin, angleAtMax);
+    }
+
+    void addOffsetToMinMaxAngles(double o) {
+        angleAtMin += o;
+        angleAtMax += o;
+    }
+
+    double fromMotorMap(double mv) {
+        // 0 --> -150 deg
+        // 1024 --> 150 deg
+        double w = (mv / 1024.0);
+        double angle = w * (angleAtMax - angleAtMin) + angleAtMin;
+        return angle;
+    }
+
+    double toMotorMap(double v) {
+        // 0 --> -150 deg
+        // 1024 --> 150 deg
+        double w = (v - angleAtMin) / (angleAtMax - angleAtMin);
+        double angle = w * 1024.0;
+        return angle;
+    }
+
+
 };
 // class Motor ends
-////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////// 
 
 
 
@@ -66,9 +99,21 @@ bool MotorMap::load(const char* const filename) {
         int index = xnMotor->IntAttribute("index");
         int id    = xnMotor->IntAttribute("id");
         std::string name = xnMotor->Attribute("name");
+        // Extra
+        bool swap = false;
+        double offset = 0.0;
+        xnMotor->QueryBoolAttribute("swap", &swap);
+        xnMotor->QueryDoubleAttribute("offset", &offset);
+
         Motor* m = new Motor(index, id, name);
+        m->addOffsetToMinMaxAngles(offset);
+
         motors.push_back(m);
-        LOG(INFO) << index << " " << id << " " << name; 
+        LOG(INFO) << index << " " << id << " " << name
+                  << "(offset = " << offset << ", "
+                  << "swap = " << swap
+                  << ")"; 
+
     }
     LOG(INFO) << "read " << numMotors() << " motor data successfully.";
 
@@ -96,7 +141,7 @@ int MotorMap::findMotorIndex(const char* const motorName) const {
 Eigen::VectorXd MotorMap::toMotorMapVector(const Eigen::VectorXd& v) const {
     Eigen::VectorXd mtv = Eigen::VectorXd::Zero(numMotors());
     FOREACH(Motor* m, motors) {
-        mtv(m->id) = v(m->index);
+        mtv(m->id) = m->toMotorMap( v(m->index) );
     }
     return mtv;
 }
@@ -104,7 +149,7 @@ Eigen::VectorXd MotorMap::toMotorMapVector(const Eigen::VectorXd& v) const {
 Eigen::VectorXd MotorMap::fromMotorMapVector(const Eigen::VectorXd& mtv) const {
     Eigen::VectorXd v = Eigen::VectorXd::Zero(numFullDimensions());
     FOREACH(Motor* m, motors) {
-        v(m->index) = mtv(m->id);
+        v(m->index) = m->fromMotorMap( mtv(m->id) );
     }
     return v;
 }

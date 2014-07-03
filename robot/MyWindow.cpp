@@ -73,6 +73,7 @@ MyWindow::~MyWindow()
 //==============================================================================
 void MyWindow::timeStepping()
 {
+    return;
     // External force
     mWorld->getSkeleton(0)->getBodyNode("torso")->addExtForce(
           mForce);
@@ -106,7 +107,7 @@ void MyWindow::drawSkels()
     for (unsigned int i = 0; i < mWorld->getNumSkeletons(); i++) {
         if (i == 1) {
             glPushMatrix();
-            glTranslated(0, -0.30, 0);
+            glTranslated(0, -0.301, 0);
             bioloidgp::utils::renderChessBoard(100, 100, 50.0, 50.0);
             glPopMatrix();
 
@@ -134,6 +135,7 @@ void MyWindow::drawSkels()
 }
 
 //==============================================================================
+int temp = 0;
 void MyWindow::keyboard(unsigned char _key, int _x, int _y)
 {
     switch (_key)
@@ -198,6 +200,9 @@ void MyWindow::keyboard(unsigned char _key, int _x, int _y)
         mImpulseDuration = 100;
         std::cout << "push left" << std::endl;
         break;
+    case 'n':  // upper right force
+        mController->setMotionTargetPose(temp);
+        temp++;
     default:
         Win3D::keyboard(_key, _x, _y);
     }

@@ -174,16 +174,15 @@ bool Motion::loadMTN(const char* const filename, const char* const motionname) {
         } else if (cmd == "step") {
             if (acceptPage) {
                 int n = tokens.size();
-                stepPose = Eigen::VectorXd::Zero(n - 3);
+
+                stepPose = Eigen::VectorXd::Zero(dim);
                 for (int i = 0; i < stepPose.size(); i++) {
-                    // stepPose(i) = lexical_cast<double>(tokens[i + 1]);
-                    double v = lexical_cast<double>(tokens[i + 1]);
-                    double w = (v / 1024.0); // 512 is center
-                    double angle = w * (angleAtMax - angleAtMin) + angleAtMin;
-                    stepPose(i) = angle;
+                    // The first one is command, the second one is "zero" indexed motor
+                    double v = lexical_cast<double>(tokens[i + 2]); 
+                    stepPose(i) = v;
                 }
                 // Remove the first entry
-                stepPose = stepPose.segment(1, dim);
+                // stepPose = stepPose.segment(1, dim);
                 
                 // Read the rest of parameters
                 stepPause = lexical_cast<double>(tokens[n - 2]);
@@ -205,6 +204,12 @@ bool Motion::loadMTN(const char* const filename, const char* const motionname) {
     }
     
     return true;
+}
+
+Eigen::VectorXd Motion::targetPoseAtIndex(int i) const {
+    i = (i % steps.size());
+    const Step& s = steps[i];
+    return s.targetpose;
 }
 
 Eigen::VectorXd Motion::targetPose(double t) const {

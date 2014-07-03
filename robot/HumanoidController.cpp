@@ -53,6 +53,26 @@ HumanoidController::HumanoidController(
 HumanoidController::~HumanoidController() {
 }
 
+void HumanoidController::setMotorMapPose(const Eigen::VectorXd& mtv) {
+    int n = robot()->getDof();
+    Eigen::VectorXd q = robot()->getPositions();
+    Eigen::VectorXd pose = motormap()->fromMotorMapVector( mtv );
+    CHECK_EQ(q.size(), pose.size());
+    q.tail(n - 6) = pose.tail(n - 6);
+    LOG(INFO) << "q = " << q.transpose();
+
+    robot()->setPositions(q);
+    robot()->computeForwardKinematics(true, true, false);
+    
+}
+
+void HumanoidController::setMotionTargetPose(int index) {
+    Eigen::VectorXd mtv = motion()->targetPoseAtIndex(index);
+    LOG(INFO) << FUNCTION_NAME();
+    LOG(INFO) << index << " : " << mtv.transpose();
+    this->setMotorMapPose(mtv);
+}
+
 void HumanoidController::update(double _currentTime) {
     const int NDOFS = robot()->getDof();
     Eigen::VectorXd q    = robot()->getPositions();
@@ -66,8 +86,13 @@ void HumanoidController::update(double _currentTime) {
     //     0.0, 0.0,
     //     0.0, 0.0,  0.6, 0.6,  -1.0, -1.0,  0.5, 0.5,  0.0, 0.0;
 
-    Eigen::VectorXd motor_qhat = motion()->targetPose(_currentTime);
-    Eigen::VectorXd qhat = motormap()->fromMotorMapVector( motor_qhat );
+    // Eigen::VectorXd motor_qhat = motion()->targetPose(_currentTime);
+    int m = motormap()->numMotors();
+    Eigen::VectorXd mtvInitPose = Eigen::VectorXd::Ones(m) * 512;
+    Eigen::VectorXd qhat = motormap()->fromMotorMapVector( mtvInitPose );
+
+    // Eigen::VectorXd motor_qhat = motion()->targetPose(_currentTime);
+    // Eigen::VectorXd qhat = motormap()->fromMotorMapVector( motor_qhat );
 
 
     tau.head<6>() = Eigen::Vector6d::Zero();

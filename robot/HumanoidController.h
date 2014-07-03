@@ -40,7 +40,11 @@ public:
         );
     virtual ~HumanoidController();
 
+    void setMotorMapPose(const Eigen::VectorXd& mtv);
+    void setMotionTargetPose(int index); // Debug Purpose
+
     virtual void update(double _currentTime);
+
     virtual void printDebugInfo() const;
     void keyboard(unsigned char _key, int _x, int _y, double _currentTime);
 

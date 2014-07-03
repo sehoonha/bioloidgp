@@ -26,6 +26,7 @@ struct Motion {
     bool load(const char* const filename);
     bool loadMTN(const char* const filename, const char* const motionname);
 
+    Eigen::VectorXd targetPoseAtIndex(int i) const;
     Eigen::VectorXd targetPose(double t) const;
 
     void printSteps();

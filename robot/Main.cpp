@@ -52,6 +52,7 @@
 
 #include "robot/MyWindow.h"
 #include "robot/HumanoidController.h"
+#include "robot/MotorMap.h"
 // #include "robot/Controller.h"
 
 using namespace std;
@@ -89,13 +90,6 @@ int main(int argc, char* argv[])
     myWorld->addSkeleton(robot);
     myWorld->addSkeleton(ground);
 
-    // Set initial configuration for Atlas robot
-    Eigen::VectorXd q = robot->getPositions();
-    q[0] = -0.5 * DART_PI;
-    Eigen::VectorXd noise = 0.02 * Eigen::VectorXd::Random( q.size() );
-    noise.head<6>().setZero();
-    robot->setPositions(q + noise);
-    robot->computeForwardKinematics(true, true, false);
 
     // Set gravity of the world
     myWorld->setGravity(Eigen::Vector3d(0.0, -9.81, 0.0));
@@ -103,6 +97,27 @@ int main(int argc, char* argv[])
     // Create a humanoid controller
     bioloidgp::robot::HumanoidController* con =
         new bioloidgp::robot::HumanoidController(robot, myWorld->getConstraintSolver());
+
+    // Set initial configuration for Atlas robot
+    LOG(INFO) << "A: " << robot->getPositions().transpose();
+
+    int m = con->motormap()->numMotors();
+    Eigen::VectorXd mtvInitPose = Eigen::VectorXd::Ones(m) * 512;
+    con->setMotorMapPose(mtvInitPose);
+    LOG(INFO) << "B: " << robot->getPositions().transpose();
+
+    // Adjust the global position and orientation
+    Eigen::VectorXd q = robot->getPositions();
+    q[0] = -0.5 * DART_PI;
+    Eigen::VectorXd noise = 0.0 * Eigen::VectorXd::Random( q.size() );
+    noise.head<6>().setZero();
+    robot->setPositions(q + noise);
+    LOG(INFO) << "C: " << robot->getPositions().transpose();
+
+    // Upddate the dynamics
+    robot->computeForwardKinematics(true, true, false);
+    LOG(INFO) << "D: " << robot->getPositions().transpose();
+
 
     // Create a window and link it to the world
     // MyWindow window(new Controller(robot, myWorld->getConstraintSolver()));
