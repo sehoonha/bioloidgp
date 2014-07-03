@@ -30,9 +30,8 @@ message(STATUS "CXX_FLAGS = ${CMAKE_CXX_FLAGS}")
 
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/glog")
 message(STATUS "Create ${CMAKE_BINARY_DIR}/glog directory")
-file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/captures")
-message(STATUS "Create ${CMAKE_BINARY_DIR}/captures directory")
-file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/captures")
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/frames")
+message(STATUS "Create ${CMAKE_BINARY_DIR}/frames directory")
 # message(STATUS "Copy ${CMAKE_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}")
 # file(COPY ${CMAKE_SOURCE_DIR}/data DESTINATION ${CMAKE_BINARY_DIR})
 

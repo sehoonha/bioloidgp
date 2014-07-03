@@ -28,7 +28,7 @@ HumanoidController::HumanoidController(
     const int NDOFS = robot()->getDof();
     const int NMOTORS = 18;
 
-    // setJointDamping(0.1);
+    setJointDamping(0.15);
 
     set_motormap( new MotorMap(NMOTORS, NDOFS) );
     motormap()->load(DATA_DIR"/urdf/BioloidGP/BioloidGPMotorMap.xml");

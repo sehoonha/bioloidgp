@@ -60,6 +60,9 @@ using namespace dart::dynamics;
 using namespace dart::simulation;
 using namespace dart::utils;
 
+// avconv -r 160 -i ./Capture%04d.png output.mp4
+
+
 int main(int argc, char* argv[])
 {
    // google::ParseCommandLineFlags(&argc, &argv, true);
