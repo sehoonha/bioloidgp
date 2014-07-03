@@ -192,7 +192,7 @@ bool Motion::loadMTN(const char* const filename, const char* const motionname) {
                 //           << "stepTime = " << stepTime << " "
                 //           << "stepPose = " << stepPose.transpose();
                 Step s;
-                s.duration = pageSpeedRate * (stepPause + stepTime);
+                s.duration = (stepPause + stepTime) / pageSpeedRate;
                 s.targetpose = stepPose;
                 steps.push_back(s);
             }

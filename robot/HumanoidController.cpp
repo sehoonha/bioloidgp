@@ -86,13 +86,17 @@ void HumanoidController::update(double _currentTime) {
     //     0.0, 0.0,
     //     0.0, 0.0,  0.6, 0.6,  -1.0, -1.0,  0.5, 0.5,  0.0, 0.0;
 
-    // Eigen::VectorXd motor_qhat = motion()->targetPose(_currentTime);
-    int m = motormap()->numMotors();
-    Eigen::VectorXd mtvInitPose = Eigen::VectorXd::Ones(m) * 512;
-    Eigen::VectorXd qhat = motormap()->fromMotorMapVector( mtvInitPose );
 
-    // Eigen::VectorXd motor_qhat = motion()->targetPose(_currentTime);
-    // Eigen::VectorXd qhat = motormap()->fromMotorMapVector( motor_qhat );
+    // int m = motormap()->numMotors();
+    // Eigen::VectorXd mtvInitPose = Eigen::VectorXd::Ones(m) * 512;
+    // mtvInitPose <<
+    //     342, 681, 572, 451, 762, 261,
+    //     358, 666,
+    //     515, 508, 741, 282, 857, 166, 684, 339, 515, 508;
+    // Eigen::VectorXd qhat = motormap()->fromMotorMapVector( mtvInitPose );
+
+    Eigen::VectorXd motor_qhat = motion()->targetPose(_currentTime);
+    Eigen::VectorXd qhat = motormap()->fromMotorMapVector( motor_qhat );
 
 
     tau.head<6>() = Eigen::Vector6d::Zero();

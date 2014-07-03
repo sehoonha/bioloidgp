@@ -106,10 +106,14 @@ bool MotorMap::load(const char* const filename) {
         xnMotor->QueryDoubleAttribute("offset", &offset);
 
         Motor* m = new Motor(index, id, name);
+        if (swap) {
+            m->swapMinMaxAngles();
+        }
         m->addOffsetToMinMaxAngles(offset);
 
         motors.push_back(m);
         LOG(INFO) << index << " " << id << " " << name
+                  << " {" << m->angleAtMin << " " << m->angleAtMax << "} "
                   << "(offset = " << offset << ", "
                   << "swap = " << swap
                   << ")"; 

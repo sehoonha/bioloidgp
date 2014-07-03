@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
     World* myWorld = new World;
     // myWorld->getConstraintSolver()->setCollisionDetector(
     //     new dart::collision::BulletCollisionDetector());
-    myWorld->setTimeStep(0.0005);
+    myWorld->setTimeStep(0.0002);
 
     // // Load ground and Atlas robot and add them to the world
     DartLoader urdfLoader;
@@ -99,24 +99,25 @@ int main(int argc, char* argv[])
         new bioloidgp::robot::HumanoidController(robot, myWorld->getConstraintSolver());
 
     // Set initial configuration for Atlas robot
-    LOG(INFO) << "A: " << robot->getPositions().transpose();
-
     int m = con->motormap()->numMotors();
     Eigen::VectorXd mtvInitPose = Eigen::VectorXd::Ones(m) * 512;
+    mtvInitPose <<
+        342, 681, 572, 451, 762, 261,
+        358, 666,
+        515, 508, 741, 282, 857, 166, 684, 339, 515, 508;
     con->setMotorMapPose(mtvInitPose);
-    LOG(INFO) << "B: " << robot->getPositions().transpose();
 
     // Adjust the global position and orientation
     Eigen::VectorXd q = robot->getPositions();
-    q[0] = -0.5 * DART_PI;
+    q[0] = -0.41 * DART_PI;
+    q[4] = -0.043;
     Eigen::VectorXd noise = 0.0 * Eigen::VectorXd::Random( q.size() );
     noise.head<6>().setZero();
     robot->setPositions(q + noise);
-    LOG(INFO) << "C: " << robot->getPositions().transpose();
 
     // Upddate the dynamics
     robot->computeForwardKinematics(true, true, false);
-    LOG(INFO) << "D: " << robot->getPositions().transpose();
+
 
 
     // Create a window and link it to the world

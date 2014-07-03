@@ -73,7 +73,6 @@ MyWindow::~MyWindow()
 //==============================================================================
 void MyWindow::timeStepping()
 {
-    return;
     // External force
     mWorld->getSkeleton(0)->getBodyNode("torso")->addExtForce(
           mForce);
