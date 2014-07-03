@@ -35,9 +35,9 @@ void parseStep(Step& s, int dim, tinyxml2::XMLElement* xnStep) {
     for (int i = 0; i < s.targetpose.size(); i++) {
         sin >> s.targetpose(i);
     }
-    LOG(INFO) << "step. duration = " << s.duration << " : pose = "
-              << s.targetpose.transpose()
-              << " (" << s.targetpose.size() << ")";
+    // LOG(INFO) << "step. duration = " << s.duration << " : pose = "
+    //           << s.targetpose.transpose()
+    //           << " (" << s.targetpose.size() << ")";
 }
 
 // struct Step ends
@@ -104,6 +104,9 @@ bool Motion::loadMTN(const char* const filename, const char* const motionname) {
 
     bool acceptPage = false;
 
+    double angleAtMin = -(5.0 / 6.0) * UTILS_PI;
+    double angleAtMax =  (5.0 / 6.0) * UTILS_PI;
+
     while(true) {
         const int MAX_LINE = 512;
         char buf[MAX_LINE + 2];
@@ -167,22 +170,32 @@ bool Motion::loadMTN(const char* const filename, const char* const motionname) {
                           << "pageRepeatTime = " << pageRepeatTime << " "
                           << "pageSpeedRate = " << pageSpeedRate << " "
                           << "pageCtrlInertialForce = " << pageCtrlInertialForce << " ";
-                
             }
-            
         } else if (cmd == "step") {
             if (acceptPage) {
                 int n = tokens.size();
                 stepPose = Eigen::VectorXd::Zero(n - 3);
                 for (int i = 0; i < stepPose.size(); i++) {
-                    stepPose(i) = lexical_cast<double>(tokens[i + 1]);
+                    // stepPose(i) = lexical_cast<double>(tokens[i + 1]);
+                    double v = lexical_cast<double>(tokens[i + 1]);
+                    double w = (v / 1024.0); // 512 is center
+                    double angle = w * (angleAtMax - angleAtMin) + angleAtMin;
+                    stepPose(i) = angle;
                 }
+                // Remove the first entry
+                stepPose = stepPose.segment(1, dim);
+                
+                // Read the rest of parameters
                 stepPause = lexical_cast<double>(tokens[n - 2]);
                 stepTime  = lexical_cast<double>(tokens[n - 1]);
-                LOG(INFO) << "command = " << cmd << ". "
-                          << "stepPause = " << stepPause << " "
-                          << "stepTime = " << stepTime << " "
-                          << "stepPose = " << stepPose.transpose();
+                // LOG(INFO) << "command = " << cmd << ". "
+                //           << "stepPause = " << stepPause << " "
+                //           << "stepTime = " << stepTime << " "
+                //           << "stepPose = " << stepPose.transpose();
+                Step s;
+                s.duration = pageSpeedRate * (stepPause + stepTime);
+                s.targetpose = stepPose;
+                steps.push_back(s);
             }
         } else if (cmd == "1c") {
             // Do nothing
@@ -207,6 +220,20 @@ Eigen::VectorXd Motion::targetPose(double t) const {
     }
     // I thing it should be reached, but..
     return Eigen::VectorXd::Zero(dim);
+}
+
+void Motion::printSteps() {
+    for (int i = 0; i < steps.size(); i++) {
+        const Step& s = steps[i];
+        std::stringstream sin;
+        sin << "Step " << i << ". ";
+        sin << "duration = " << s.duration << " : pose = ";
+        for (int j = 0; j < s.targetpose.size(); j++) {
+            sin << s.targetpose(j) << " ";
+        }
+        sin << " (" << s.targetpose.size() << ")";
+        LOG(INFO) << sin.str();
+    }    
 }
 
 // struct Motion ends

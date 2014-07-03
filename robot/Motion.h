@@ -28,6 +28,8 @@ struct Motion {
 
     Eigen::VectorXd targetPose(double t) const;
 
+    void printSteps();
+
     int dim;
     int stepIndex;
     std::vector<Step> steps;

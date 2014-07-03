@@ -49,6 +49,8 @@ using google::FATAL;
 
 #define DATA_DIR "../data"
 
+#define UTILS_PI 3.14159265359
+
 // #include "Paths.h"
 
 #endif // #ifndef APP_CPPCOMMON_H

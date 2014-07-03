@@ -36,7 +36,8 @@ HumanoidController::HumanoidController(
     set_motion( new Motion(NMOTORS) );
     // motion()->load(DATA_DIR"/xml/motion.xml");
     motion()->loadMTN(DATA_DIR"/mtn/bio_gp_humanoid_kr.mtn", "HandStanding");
-    exit(0);
+    motion()->printSteps();
+    // exit(0);
 
     mKp = Eigen::VectorXd::Zero(NDOFS);
     mKd = Eigen::VectorXd::Zero(NDOFS);
