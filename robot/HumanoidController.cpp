@@ -35,7 +35,8 @@ HumanoidController::HumanoidController(
 
     set_motion( new Motion(NMOTORS) );
     // motion()->load(DATA_DIR"/xml/motion.xml");
-    motion()->loadMTN(DATA_DIR"/mtn/bio_gp_humanoid_kr.mtn", "HandStanding");
+    // motion()->loadMTN(DATA_DIR"/mtn/bio_gp_humanoid_kr.mtn", "HandStanding");
+    motion()->loadMTN(DATA_DIR"/mtn/bio_gp_humanoid_kr.mtn", "SideDumbling");
     motion()->printSteps();
     // exit(0);
 

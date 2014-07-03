@@ -158,7 +158,7 @@ void MyWindow::keyboard(unsigned char _key, int _x, int _y)
     case '[':  // step backward
         if (!mSimulating)
         {
-            mPlayFrame--;
+            mPlayFrame-=10;
             if (mPlayFrame < 0)
                 mPlayFrame = 0;
             glutPostRedisplay();
@@ -167,7 +167,7 @@ void MyWindow::keyboard(unsigned char _key, int _x, int _y)
     case ']':  // step forwardward
         if (!mSimulating)
         {
-            mPlayFrame++;
+            mPlayFrame+=10;
             if (mPlayFrame >= mWorld->getRecording()->getNumFrames())
                 mPlayFrame = 0;
             glutPostRedisplay();
