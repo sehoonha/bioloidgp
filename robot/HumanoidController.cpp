@@ -33,7 +33,10 @@ HumanoidController::HumanoidController(
     set_motormap( new MotorMap(NMOTORS, NDOFS) );
     motormap()->load(DATA_DIR"/urdf/BioloidGP/BioloidGPMotorMap.xml");
 
-    set_motion( new Motion(NMOTORS) );
+    Eigen::VectorXd initPose = robot()->getPositions();
+    Eigen::VectorXd mtvInitPose = motormap()->toMotorMapVector(initPose);
+
+    set_motion( new Motion(NMOTORS, mtvInitPose) );
     // motion()->load(DATA_DIR"/xml/motion.xml");
     motion()->loadMTN(DATA_DIR"/mtn/bio_gp_humanoid_kr.mtn", "HandStanding");
     // motion()->loadMTN(DATA_DIR"/mtn/bio_gp_humanoid_kr.mtn", "SideDumbling");

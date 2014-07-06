@@ -53,6 +53,7 @@
 #include "robot/MyWindow.h"
 #include "robot/HumanoidController.h"
 #include "robot/MotorMap.h"
+#include "robot/Motion.h"
 // #include "robot/Controller.h"
 
 using namespace std;
@@ -101,6 +102,7 @@ int main(int argc, char* argv[])
     bioloidgp::robot::HumanoidController* con =
         new bioloidgp::robot::HumanoidController(robot, myWorld->getConstraintSolver());
 
+
     // Set initial configuration for Atlas robot
     int m = con->motormap()->numMotors();
     Eigen::VectorXd mtvInitPose = Eigen::VectorXd::Ones(m) * 512;
@@ -109,6 +111,7 @@ int main(int argc, char* argv[])
         358, 666,
         515, 508, 741, 282, 857, 166, 684, 339, 515, 508;
     con->setMotorMapPose(mtvInitPose);
+    con->motion()->setInitialPose(mtvInitPose);
 
     // Adjust the global position and orientation
     Eigen::VectorXd q = robot->getPositions();

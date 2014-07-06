@@ -17,14 +17,17 @@ namespace robot {
 
 struct Step {
     Step();
+    double pause;
     double duration;
     Eigen::VectorXd targetpose;
 }; // struct Motion
 
 struct Motion {
-    Motion(int _dim);
+    Motion(int _dim, const Eigen::VectorXd& _init);
     bool load(const char* const filename);
     bool loadMTN(const char* const filename, const char* const motionname);
+
+    void setInitialPose(const Eigen::VectorXd& _init) { initialPose = _init; }
 
     Eigen::VectorXd targetPoseAtIndex(int i) const;
     Eigen::VectorXd targetPose(double t) const;
@@ -34,6 +37,7 @@ struct Motion {
     int dim;
     int stepIndex;
     std::vector<Step> steps;
+    Eigen::VectorXd initialPose;
 }; // struct Motion
 
 } // namespace robot

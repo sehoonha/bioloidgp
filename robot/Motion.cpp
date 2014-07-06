@@ -45,10 +45,11 @@ void parseStep(Step& s, int dim, tinyxml2::XMLElement* xnStep) {
 
 ////////////////////////////////////////////////////////////
 // struct Motion implementation
-Motion::Motion(int _dim)
+Motion::Motion(int _dim, const Eigen::VectorXd& _init)
     : dim(_dim)
     , stepIndex(-1)
 {
+    setInitialPose(_init);
 }
 
 bool Motion::load(const char* const filename) {
@@ -192,7 +193,9 @@ bool Motion::loadMTN(const char* const filename, const char* const motionname) {
                 //           << "stepTime = " << stepTime << " "
                 //           << "stepPose = " << stepPose.transpose();
                 Step s;
-                s.duration = (stepPause + stepTime) / pageSpeedRate;
+                // s.duration = (stepPause + stepTime) / pageSpeedRate;
+                s.duration = stepTime / pageSpeedRate;
+                s.pause    = stepPause / pageSpeedRate;
                 s.targetpose = stepPose;
                 steps.push_back(s);
             }
@@ -213,18 +216,40 @@ Eigen::VectorXd Motion::targetPoseAtIndex(int i) const {
 }
 
 Eigen::VectorXd Motion::targetPose(double t) const {
+    // If there are no steps..
+    if (steps.size() == 0) {
+        return initialPose;
+    }
+
+    Eigen::VectorXd prevStepPose = initialPose;
+
+    // For each step
     double accum_t = 0.0;
     for (int i = 0; i < steps.size(); i++) {
         const Step& s = steps[i];
-        accum_t += s.duration;
-        bool is_last = ((i + 1) == steps.size());
-        if (t <= accum_t || is_last) {
-            // cout << t << " " << accum_t << " -> " << i << endl;
-            return s.targetpose;
+
+        // Case 1. The accumulated time is within the pause time
+        accum_t += s.pause;
+        if (t <= accum_t) {
+            return prevStepPose;
         }
+
+        // Case 2. The accumulated time is within the duration
+        if (t <= accum_t + s.duration) {
+            // return s.targetpose;
+
+            double t_step = t - accum_t;
+            double w = t_step / s.duration;
+            Eigen::VectorXd pose = ((1 - w) * prevStepPose) + (w * s.targetpose);
+            return pose;
+        }
+        accum_t += s.duration;
+        // Update prevStepPose
+        prevStepPose = s.targetpose;
     }
-    // I thing it should be reached, but..
-    return Eigen::VectorXd::Zero(dim);
+
+    // If we go though all the motion, 
+    return steps[ steps.size() - 1 ].targetpose;
 }
 
 void Motion::printSteps() {
