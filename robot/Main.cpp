@@ -94,6 +94,8 @@ int main(int argc, char* argv[])
     myWorld->addSkeleton(robot);
     myWorld->addSkeleton(ground);
 
+    // Print some info
+    LOG(INFO) << "robot.mass = " << robot->getMass();
 
     // Set gravity of the world
     myWorld->setGravity(Eigen::Vector3d(0.0, -9.81, 0.0));

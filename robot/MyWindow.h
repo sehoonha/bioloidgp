@@ -68,6 +68,7 @@ public:
     // Documentation inherited
     virtual void keyboard(unsigned char _key, int _x, int _y);
 
+    void calculateInertia();
 private:
     /// \brief External force to exert on Atlas robot
     Eigen::Vector3d mForce;

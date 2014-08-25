@@ -70,6 +70,7 @@ MyWindow::~MyWindow()
     delete mController;
 }
 
+int g_cnt = 0;
 //==============================================================================
 void MyWindow::timeStepping()
 {
@@ -82,7 +83,12 @@ void MyWindow::timeStepping()
 
     // simulate one step
     mWorld->step();
-
+    
+    if (g_cnt % 500 == 0) {
+        calculateInertia();
+    }
+    g_cnt++;
+    
     // for perturbation test
     mImpulseDuration--;
     if (mImpulseDuration <= 0)
@@ -118,6 +124,14 @@ void MyWindow::drawSkels()
             continue;
         }
         mWorld->getSkeleton(i)->draw(mRI);
+        // {
+        //     Eigen::Vector3d C = mWorld->getSkeleton(i)->getWorldCOM();
+        //     glPushMatrix();
+        //     glTranslated(C(0), C(1), C(2));
+        //     bioloidgp::utils::renderAxis(1.0);
+        //     glPopMatrix();
+        // }
+        
     }
 
     // draw arrow
@@ -132,6 +146,28 @@ void MyWindow::drawSkels()
         dart::gui::drawArrow3D(start, mForce, len, 0.05, 0.1);
     }
 }
+
+void MyWindow::calculateInertia() {
+    dart::dynamics::Skeleton* robot = mWorld->getSkeleton(0);
+    int n = robot->getNumBodyNodes();
+
+    double I = 0.0;
+    double m = 0;
+    double OFFSET = -0.30;
+    for (int i = 0; i < n; i++) {
+        dart::dynamics::BodyNode* bn = robot->getBodyNode(i);
+        m += bn->getMass();
+        Eigen::Vector3d p = bn->getWorldCOM();
+        double y = p.y() - (OFFSET); // Subtract the feet height
+        double z = p.z();
+        // cout << bn->getName() << " " << y << " " << z << endl;
+        I += bn->getMass() * (y * y + z * z);
+    }
+    Eigen::Vector3d C = robot->getWorldCOM();
+    cout << m << ", " << I << ", " << C.y() - OFFSET << ", " << C.z() << endl;
+    
+}
+
 
 //==============================================================================
 int temp = 0;
@@ -172,6 +208,9 @@ void MyWindow::keyboard(unsigned char _key, int _x, int _y)
                 mPlayFrame = 0;
             glutPostRedisplay();
         }
+        break;
+    case 'I':  // print debug information
+        calculateInertia();
         break;
     case 'i':  // print debug information
         mController->printDebugInfo();
